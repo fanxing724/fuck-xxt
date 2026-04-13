@@ -6,9 +6,9 @@ COPY . /app
 
 RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
-# 创建配置文件目录并提供默认配置
+# 创建配置文件目录并提供示例配置
 RUN mkdir -p /config && \
-    cp config_template.ini /config/config.ini
+    cp config.ini.example /config/config.ini
 
 # 定义卷，用户可以挂载自己的配置文件
 VOLUME /config

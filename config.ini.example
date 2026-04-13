@@ -1,0 +1,47 @@
+[common]
+; 手机号账号(必填)
+username = 
+
+; 登录密码(必填)
+password = 
+
+; 要学习的课程ID列表, 逗号隔开(选填，不需要则留空)
+course_list = 
+
+; 视频播放倍速(默认1，最大2)
+speed = 2
+
+; 遇到关闭任务点时的行为: retry-重试, ask-询问, continue-继续
+notopen_action = retry
+
+[tiku]
+; 可选项 :
+; 1. TikuYanxi(言溪题库 https://tk.enncy.cn/)
+; 2. AI (OpenAI兼容API)
+; 3. SiliconFlow (硅基流动API)
+provider = TikuYanxi
+
+; 是否直接提交答题，填写false表示答完题后不提交而是保存
+; 填写true表示直接提交，不保证正确率
+submit = false
+
+; 用于言溪题库的TOKEN，多个用英文逗号隔开
+tokens = 
+
+; AI题库配置 (provider=AI时生效)
+; openai_api_base = https://api.openai.com/v1
+; openai_api_key = 
+; openai_model = gpt-4o-mini
+
+; 用于判断判断题对应的选项
+true_list = 正确,对,√,是
+false_list = 错误,错,×,否,不对,不正确
+
+; 覆盖率
+cover_rate = 0.8
+
+[notification]
+; 通知方式: 留空不通知
+; 支持: Bark, PushPlus, ServerChan, DingTalk, WebHook
+provider = 
+token = 

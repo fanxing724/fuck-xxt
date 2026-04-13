@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import random
+import re
+import time
 from enum import Enum
 from hashlib import md5
 
@@ -324,16 +327,16 @@ class Chaoxing:
             return self.StudyResult.SUCCESS
 
     def study_work(self, _course, _job, _job_info) -> StudyResult:
-        if self.tiku.DISABLE or not self.tiku:
+        if not self.tiku or self.tiku.DISABLE:
             return self.StudyResult.SUCCESS
         _ORIGIN_HTML_CONTENT = ""  # 用于配合输出网页源码, 帮助修复#391错误
 
-        def random_answer(options: str) -> str:
+        def random_answer(options: str, q_type: str) -> str:
             answer = ""
             if not options:
                 return answer
 
-            if q["type"] == "multiple":
+            if q_type == "multiple":
                 logger.debug(f"当前选项列表[cut前] -> {options}")
                 _op_list = multi_cut(options)
                 logger.debug(f"当前选项列表[cut后] -> {_op_list}")
@@ -545,7 +548,7 @@ class Chaoxing:
             answer = ""
             if not res:
                 # 随机答题
-                answer = random_answer(q["options"])
+                answer = random_answer(q["options"], q["type"])
                 q[f'answerSource{q["id"]}'] = "random"
             else:
                 # 根据响应结果选择答案
@@ -575,9 +578,9 @@ class Chaoxing:
                 elif q["type"] == "judgement":
                     answer = "true" if self.tiku.judgement_select(res) else "false"
                 elif q["type"] == "completion":
-                    if isinstance(res,list):
-                        answer = "".join(answer)
-                    elif isinstance(res,str):
+                    if isinstance(res, list):
+                        answer = "".join(res)
+                    elif isinstance(res, str):
                         answer = res
                 else:
                     # 其他类型直接使用答案 （目前仅知有简答题，待补充处理）
@@ -585,7 +588,7 @@ class Chaoxing:
 
                 if not answer:  # 检查 answer 是否为空
                     logger.warning(f"找到答案但答案未能匹配 -> {res}\t随机选择答案")
-                    answer = random_answer(q["options"])  # 如果为空，则随机选择答案
+                    answer = random_answer(q["options"], q["type"])  # 如果为空，则随机选择答案
                     q[f'answerSource{q["id"]}'] = "random"
                 else:
                     logger.info(f"成功获取到答案：{answer}")
