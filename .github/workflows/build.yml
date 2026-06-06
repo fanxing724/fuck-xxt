@@ -23,19 +23,19 @@ jobs:
             target: linux
             ext: ''
             sep: ':'
-            archive_cmd: tar -czf "../fuck-xxt-linux.tar.gz" "fuck-xxt-linux"
+            archive_cmd: tar -czf "fuck-xxt-linux.tar.gz" "dist/fuck-xxt-linux"
           - os: macos-13
             target: macos
             ext: ''
             sep: ':'
             pyinstaller_args: --target-architecture x86_64
-            archive_cmd: tar -czf "../fuck-xxt-macos.tar.gz" "fuck-xxt-macos"
+            archive_cmd: tar -czf "fuck-xxt-macos.tar.gz" "dist/fuck-xxt-macos"
           - os: windows-2019
             target: windows
             ext: .exe
             sep: ';'
             pyinstaller_args: ''
-            archive_cmd: 7z a -tzip "../fuck-xxt-windows.zip" "fuck-xxt-windows.exe"
+            archive_cmd: 7z a -tzip "fuck-xxt-windows.zip" "dist/fuck-xxt-windows.exe"
 
     runs-on: ${{ matrix.os }}
 
@@ -70,15 +70,13 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target == 'macos' && '10.13' }}
 
       - name: Create archive
-        run: |
-          cd dist
-          ${{ matrix.archive_cmd }}
+        run: ${{ matrix.archive_cmd }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: fuck-xxt-${{ matrix.target }}
-          path: dist/../fuck-xxt-${{ matrix.target }}.*
+          path: fuck-xxt-${{ matrix.target }}.*
           if-no-files-found: warn
 
   release:
