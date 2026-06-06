@@ -22,15 +22,18 @@ jobs:
           - os: ubuntu-latest
             target: linux
             ext: ''
+            sep: ':'
             archive_cmd: tar -czf "../fuck-xxt-linux.tar.gz" "fuck-xxt-linux"
           - os: macos-13
             target: macos
             ext: ''
+            sep: ':'
             pyinstaller_args: --target-architecture x86_64
             archive_cmd: tar -czf "../fuck-xxt-macos.tar.gz" "fuck-xxt-macos"
           - os: windows-2019
             target: windows
             ext: .exe
+            sep: ';'
             pyinstaller_args: ''
             archive_cmd: 7z a -tzip "../fuck-xxt-windows.zip" "fuck-xxt-windows.exe"
 
@@ -57,8 +60,8 @@ jobs:
           pyinstaller --clean --noconfirm `
             --name "fuck-xxt-${{ matrix.target }}" `
             --onefile `
-            --add-data "app;app" `
-            --add-data "config;config" `
+            --add-data "app${{ matrix.sep }}app" `
+            --add-data "config${{ matrix.sep }}config" `
             --collect-all "app" `
             ${{ matrix.pyinstaller_args }} `
             launcher.py
