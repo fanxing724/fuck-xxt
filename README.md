@@ -1,6 +1,20 @@
 # SuperStar 网页控制台版
 
+[![Build and Release](https://github.com/fanxing724/fuck-xxt/actions/workflows/build.yml/badge.svg)](https://github.com/fanxing724/fuck-xxt/actions/workflows/build.yml)
+
 超星学习通自动学习脚本，提供本地网页控制台。默认启动浏览器界面，可填写账号、课程、倍速和 AI 答题配置，并实时查看运行日志。
+
+## 下载
+
+从 [Releases](https://github.com/fanxing724/fuck-xxt/releases) 下载对应平台的预编译包：
+
+| 平台 | 文件 |
+|------|------|
+| Windows 7+ | `fuck-xxt-windows.zip` (单文件 exe) |
+| macOS 10.13+ | `fuck-xxt-macos.tar.gz` |
+| Linux | `fuck-xxt-linux.tar.gz` |
+
+下载解压后直接运行即可，无需安装 Python。
 
 ## 功能
 
@@ -8,7 +22,7 @@
 - 支持课程 ID 留空时学习全部课程
 - 支持 OpenAI 兼容接口作为 AI 题库
 - 支持自动获取模型列表
-- 支持 Windows、macOS、Linux
+- 支持 Windows 7+、macOS 10.13+、Linux
 
 ## 快速开始
 
