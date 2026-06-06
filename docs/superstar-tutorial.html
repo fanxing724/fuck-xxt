@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超星/学习通刷课脚本使用教程</title>
+    <style>
+        :root {
+            --primary-color: #4a90d9;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --code-bg: #282c34;
+            --border-color: #e1e4e8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+        }
+
+        .core-principle {
+            background: rgba(255,255,255,0.15);
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1.05em;
+        }
+
+        .core-principle strong {
+            color: #ffd700;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 .number {
+            background: var(--primary-color);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .warning-box::before {
+            content: "⚠️ ";
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .info-box::before {
+            content: "💡 ";
+        }
+
+        .step-list {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .step-list li {
+            position: relative;
+            padding: 12px 15px 12px 50px;
+            margin-bottom: 10px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            counter-increment: step-counter;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: "Fira Code", "Source Code Pro", Consolas, monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-label);
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.75em;
+            color: #5c6370;
+            text-transform: uppercase;
+        }
+
+        .code-block .keyword {
+            color: #c678dd;
+        }
+
+        .code-block .string {
+            color: #98c379;
+        }
+
+        .code-block .comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .code-block .param {
+            color: #e06c75;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            margin: 5px 5px 5px 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .link-button:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+        }
+
+        .highlight {
+            background: linear-gradient(transparent 60%, #ffeb3b 60%);
+            padding: 0 3px;
+        }
+
+        .sub-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .sub-section h3 {
+            color: var(--secondary-color);
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin: 0 8px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .update-badge {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 1.6em;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .code-block {
+                font-size: 0.8em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 超星/学习通刷课脚本使用教程</h1>
+            <div class="core-principle">
+                <strong>核心原理：</strong>利用GitHub Action云端运行Python脚本，模拟人工逐秒观看视频，无需本地挂机，降低检测风险
+            </div>
+        </header>
+
+        <section class="section">
+            <h2><span class="number">一</span>用前必看</h2>
+            <div class="warning-box">
+                脚本依托GitHub Action云端运行，配置完成后可自动执行
+            </div>
+            <p style="margin-bottom: 15px;"><strong>触发方式有两种：</strong></p>
+            <ul class="step-list">
+                <li>修改仓库任意文件（首次提交脚本时触发）</li>
+                <li>手动开启后，每天早8点定时刷课，每日自动观看6小时后关闭</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2><span class="number">二</span>准备工作</h2>
+            <div class="step-list">
+                <li>
+                    <strong>注册GitHub账户</strong><br>
+                    地址：<a href="https://github.com/" target="_blank" class="link-button">github.com</a><br>
+                    <small style="color: #666;">（访问需自行解决代理问题）</small>
+                </li>
+                <li>
+                    <strong>Fork目标项目</strong><br>
+                    地址：<a href="https://github.com/lispringing/SuperStar" target="_blank" class="link-button">lispringing/SuperStar</a><br>
+                    <small style="color: #666;">（建议点亮星标 ⭐）</small><br>
+                    <span class="arrow">→</span>Fork后自动跳转至个人仓库
+                </li>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2><span class="number">三</span>配置与运行步骤</h2>
+            
+            <div class="sub-section">
+                <h3>1. 开启Actions功能</h3>
+                <p>进入个人仓库 <span class="arrow">→</span> 点击「<strong>Actions</strong>」按钮 <span class="arrow">→</span> 开启该功能</p>
+                <div class="info-box">手机端为折叠状态，需展开查看</div>
+            </div>
+
+            <div class="sub-section">
+                <h3>2. 编辑配置文件</h3>
+                <ul class="step-list">
+                    <li>进入仓库目录 <code style="background:#eee;padding:2px 8px;border-radius:4px;">.github/workflows</code></li>
+                    <li>打开 <code style="background:#eee;padding:2px 8px;border-radius:4px;">main.yml</code> 文件并点击编辑</li>
+                </ul>
+                <p style="margin: 15px 0;"><strong>核心修改最后一行，替换为个人信息：</strong></p>
+                <div class="code-block" data-label="main.yml">
+<span class="comment"># 修改前</span>
+- name: Run main.py
+  run: python main.py -u 学习通账号 -p 学习通密码 -l 课程id
+
+<span class="comment"># 修改后（示例）</span>
+- name: Run main.py
+  run: python main.py -u <span class="string">"your_phone_number"</span> -p <span class="string">"your_password"</span> -l <span class="string">"course_id"</span>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <h3>3. 提交并运行</h3>
+                <p>修改完成后提交文件，若账号、密码、课程ID无误，GitHub Actions将自动启动脚本，可在「<strong>Actions</strong>」页面查看运行状态。</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2><span class="number">四</span>开启每日定时刷课 <span class="update-badge">更新于2024.12.6</span></h2>
+            
+            <div class="step-list">
+                <li>再次编辑 <code style="background:#eee;padding:2px 8px;border-radius:4px;">main.yml</code> 文件</li>
+                <li>找到定时配置段，删除原有注释（注意缩进格式）</li>
+            </div>
+
+            <p style="margin: 15px 0;"><strong>原内容：</strong></p>
+            <div class="code-block" data-label="修改前">
+<span class="comment">#是否开始每天8点定时刷课，若要开启请把下面两行注释去掉</span>
+<span class="comment">#schedule:</span>
+<span class="comment">#  - cron: "0 8 * * *"</span>
+            </div>
+
+            <p style="margin: 15px 0;"><strong>修改后：</strong></p>
+            <div class="code-block" data-label="修改后">
+<span class="comment">#是否开始每天8点定时刷课，若要开启请把下面两行注释去掉</span>
+<span class="keyword">schedule:</span>
+  - <span class="param">cron</span>: <span class="string">"0 8 * * *"</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2><span class="number">五</span>课程ID获取方法</h2>
+            <ul class="step-list">
+                <li>电脑端打开超星学习通网页版，登录后进入目标课程</li>
+                <li>浏览器地址栏中的<span class="highlight">第一串数字</span>，即为该课程的ID</li>
+            </ul>
+            <div class="code-block" data-label="地址栏示例">
+https://mooc1.chaoxing.com/course/<span class="highlight" style="background:#ffeb3b;padding:0 5px;color:#333;">123456789</span>.html
+                                         <span style="color:#e74c3c;">↑ 课程ID</span>
+            </div>
+        </section>
+
+        <footer>
+            <p>Made with ❤️ | 仅供学习交流使用</p>
+        </footer>
+    </div>
+</body>
+</html>

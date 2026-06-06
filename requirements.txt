@@ -1,0 +1,9 @@
+requests
+pyaes
+beautifulsoup4
+lxml
+loguru
+fonttools
+httpx
+openai
+ddddocr
