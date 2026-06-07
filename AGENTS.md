@@ -1,8 +1,8 @@
-# SuperStar 网页控制台版 - AGENTS.md
+# 番星 StudyFlow 网页控制台版 - AGENTS.md
 
 ## 项目概述
 
-- **项目名称**: SuperStar 网页控制台版 (fuck-xxt)
+- **项目名称**: 番星 StudyFlow 网页控制台版 (fuck-xxt)
 - **项目路径**: `/Users/fanxing/Desktop/fuck-xxt`
 - **技术栈**: Python 3
 - **代码托管**: GitHub (git@github.com:fanxing724/fuck-xxt.git)

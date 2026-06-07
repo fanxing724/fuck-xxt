@@ -27,10 +27,10 @@ CONFIG_PATH = BASE_DIR / "config.ini"
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 
-class SuperStarDesktop(tk.Tk):
+class FanxingStudyFlowDesktop(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("SuperStar 桌面版")
+        self.title("番星 StudyFlow 桌面版")
         self.geometry("1080x840")
         self.minsize(920, 700)
 
@@ -69,7 +69,7 @@ class SuperStarDesktop(tk.Tk):
         root.columnconfigure(1, weight=1)
         root.rowconfigure(8, weight=1)
 
-        title = ttk.Label(root, text="SuperStar 桌面版", font=("Helvetica", 20, "bold"))
+        title = ttk.Label(root, text="番星 StudyFlow 桌面版", font=("Helvetica", 20, "bold"))
         title.grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 14))
 
         ttk.Label(root, text="手机号").grid(row=1, column=0, sticky="w", pady=6)
@@ -422,7 +422,7 @@ class SuperStarDesktop(tk.Tk):
 
 
 def main():
-    app = SuperStarDesktop()
+    app = FanxingStudyFlowDesktop()
     app.mainloop()
 
 

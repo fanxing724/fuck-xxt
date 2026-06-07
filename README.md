@@ -1,4 +1,4 @@
-# SuperStar 网页控制台版
+# 番星 StudyFlow 网页控制台版
 
 [![Build and Release](https://github.com/fanxing724/fuck-xxt/actions/workflows/build.yml/badge.svg)](https://github.com/fanxing724/fuck-xxt/actions/workflows/build.yml)
 
@@ -10,11 +10,13 @@
 
 | 平台 | 文件 |
 |------|------|
-| Windows 7+ | `fuck-xxt-windows.zip` (单文件 exe) |
-| macOS 10.13+ | `fuck-xxt-macos.tar.gz` |
-| Linux | `fuck-xxt-linux.tar.gz` |
+| Windows 7 - Windows 11 | `FanxingStudyFlow-windows7-win11-x64.zip` (单文件 exe) |
+| macOS 10.13+ | `FanxingStudyFlow-macos10.13-x64.tar.gz` (内含 `FanxingStudyFlow.app`) |
+| Linux x64 | `FanxingStudyFlow-linux-x64.tar.gz` |
 
 下载解压后直接运行即可，无需安装 Python。
+
+本地或 CI 打包方式见 [PACKAGING.md](PACKAGING.md)。
 
 ## 功能
 

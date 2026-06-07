@@ -19,65 +19,44 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            target: linux
-            ext: ''
-            sep: ':'
-            archive_cmd: tar -czf "fuck-xxt-linux.tar.gz" "dist/fuck-xxt-linux"
-          - os: macos-13
-            target: macos
-            ext: ''
-            sep: ':'
-            pyinstaller_args: --target-architecture x86_64
-            archive_cmd: tar -czf "fuck-xxt-macos.tar.gz" "dist/fuck-xxt-macos"
           - os: windows-2019
             target: windows
-            ext: .exe
-            sep: ';'
-            pyinstaller_args: ''
-            archive_cmd: 7z a -tzip "fuck-xxt-windows.zip" "dist/fuck-xxt-windows.exe"
+            artifact_name: FanxingStudyFlow-windows7-win11-x64
+            build_cmd: pwsh scripts/build_windows_app.ps1
+            artifact_path: release/FanxingStudyFlow-windows7-win11-x64.zip
+          - os: macos-13
+            target: macos
+            artifact_name: FanxingStudyFlow-macos10.13-x64
+            build_cmd: bash scripts/build_macos_app.sh
+            artifact_path: release/FanxingStudyFlow-macos10.13-x64.tar.gz
+          - os: ubuntu-20.04
+            target: linux
+            artifact_name: FanxingStudyFlow-linux-x64
+            build_cmd: bash scripts/build_linux_app.sh
+            artifact_path: release/FanxingStudyFlow-linux-x64.tar.gz
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+          architecture: x64
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+      - name: Build ${{ matrix.target }} package
+        run: ${{ matrix.build_cmd }}
         env:
-          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target == 'macos' && '10.13' }}
-
-      - name: Build with PyInstaller
-        run: |
-          pyinstaller --clean --noconfirm `
-            --name "fuck-xxt-${{ matrix.target }}" `
-            --onefile `
-            --add-data "app${{ matrix.sep }}app" `
-            --add-data "config${{ matrix.sep }}config" `
-            --collect-all "app" `
-            ${{ matrix.pyinstaller_args }} `
-            launcher.py
-        shell: pwsh
-        env:
-          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target == 'macos' && '10.13' }}
-
-      - name: Create archive
-        run: ${{ matrix.archive_cmd }}
+          MACOSX_DEPLOYMENT_TARGET: '10.13'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fuck-xxt-${{ matrix.target }}
-          path: fuck-xxt-${{ matrix.target }}.*
-          if-no-files-found: warn
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
 
   release:
     needs: [build]
@@ -87,7 +66,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          pattern: fuck-xxt-*
+          pattern: FanxingStudyFlow-*
           merge-multiple: true
 
       - name: Create Release

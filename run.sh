@@ -1,5 +1,5 @@
 #!/bin/bash
-# SuperStar 主启动器：默认网页控制台，--cli 进入命令行模式
+# 番星 StudyFlow 主启动器：默认网页控制台，--cli 进入命令行模式
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1

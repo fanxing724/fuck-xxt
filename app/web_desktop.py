@@ -31,6 +31,7 @@ else:
 CONFIG_PATH = BASE_DIR / "config.ini"
 STATIC_DIR = APP_DIR / "static"
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
+MAX_SERVER_LOG_LINES = 1000
 
 
 def clamp_float(value, default, minimum, maximum):
@@ -223,6 +224,7 @@ class Runner:
         self.process = None
         self.temp_config = None
         self.logs = []
+        self.log_start = 0
         self.status = "就绪"
         self.exit_code = None
         self.started_at = None
@@ -231,17 +233,25 @@ class Runner:
         clean = ANSI_RE.sub("", text)
         with self.lock:
             self.logs.append(clean)
+            overflow = len(self.logs) - MAX_SERVER_LOG_LINES
+            if overflow > 0:
+                del self.logs[:overflow]
+                self.log_start += overflow
 
     def snapshot(self, since):
         with self.lock:
             running = self.process is not None and self.process.poll() is None
+            start = max(since, self.log_start)
+            logs = self.logs[start - self.log_start :]
+            if since < self.log_start:
+                logs = ["[日志已自动清理，仅保留最近输出]\n", *logs]
             return {
                 "status": self.status,
                 "running": running,
                 "exit_code": self.exit_code,
                 "started_at": self.started_at,
-                "logs": self.logs[since:],
-                "next": len(self.logs),
+                "logs": logs,
+                "next": self.log_start + len(self.logs),
             }
 
     def validate(self, fields):
@@ -264,6 +274,7 @@ class Runner:
             if self.process is not None and self.process.poll() is None:
                 return False, "任务正在运行"
             self.logs = []
+            self.log_start = 0
             self.status = "准备启动"
             self.exit_code = None
             self.started_at = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -340,7 +351,7 @@ class Runner:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "SuperStarWeb/1.0"
+    server_version = "FanxingStudyFlowWeb/1.0"
 
     def log_message(self, fmt, *args):
         return
@@ -412,7 +423,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def send_static(self, request_path):
-        relative = request_path.removeprefix("/static/").lstrip("/")
+        relative = request_path[len("/static/") :].lstrip("/")
         path = (STATIC_DIR / relative).resolve()
         if STATIC_DIR.resolve() not in path.parents and path != STATIC_DIR.resolve():
             self.send_error(403)
@@ -441,28 +452,28 @@ HTML = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SuperStar 网页控制台</title>
+<title>番星 StudyFlow 网页控制台</title>
 <style>
 :root {
   color-scheme: light;
-  --surface: rgba(255, 255, 255, 0.86);
-  --surface-strong: rgba(255, 255, 255, 0.94);
-  --line: rgba(255, 255, 255, 0.38);
+  --surface: rgba(255, 255, 255, 0.68);
+  --surface-strong: rgba(255, 255, 255, 0.78);
+  --line: rgba(255, 255, 255, 0.34);
   --text: #241f2b;
   --muted: #5f566b;
   --accent: #8a4de8;
   --accent-strong: #6b32c4;
-  --accent-soft: rgba(246, 239, 255, 0.9);
+  --accent-soft: rgba(246, 239, 255, 0.68);
   --danger: #b42318;
   --warn: #9a5a00;
-  --log-bg: rgba(18, 15, 28, 0.88);
+  --log-bg: rgba(18, 15, 28, 0.72);
   --log-text: #f5f0ff;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background:
-    linear-gradient(90deg, rgba(17, 13, 24, 0.86), rgba(17, 13, 24, 0.28) 46%, rgba(17, 13, 24, 0.78)),
+    linear-gradient(90deg, rgba(17, 13, 24, 0.46), rgba(17, 13, 24, 0.08) 46%, rgba(17, 13, 24, 0.38)),
     url("/static/background.jpeg") center / cover fixed no-repeat;
   color: var(--text);
   font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
@@ -478,7 +489,7 @@ header {
   justify-content: space-between;
   gap: 16px;
   padding: 16px 22px;
-  background: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.22);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(10px);
 }
@@ -496,7 +507,7 @@ h1 {
   min-height: 30px;
   padding: 0 10px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.62);
   color: #3a2d4b;
   border-radius: 6px;
   white-space: nowrap;
@@ -522,7 +533,8 @@ section {
 .log-section {
   display: grid;
   grid-template-rows: auto 1fr;
-  min-height: calc(100vh - 82px);
+  height: calc(100vh - 82px);
+  min-height: 360px;
 }
 .section-head {
   display: flex;
@@ -532,7 +544,7 @@ section {
   min-height: 48px;
   padding: 12px 14px;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.46);
+  background: rgba(255, 255, 255, 0.30);
 }
 h2 {
   margin: 0;
@@ -647,6 +659,7 @@ button:disabled {
 pre {
   margin: 0;
   padding: 14px;
+  min-height: 0;
   background: var(--log-bg);
   color: var(--log-text);
   overflow: auto;
@@ -656,7 +669,8 @@ pre {
 }
 @media (max-width: 900px) {
   main { grid-template-columns: 1fr; }
-  .form-section, .log-section { height: auto; min-height: auto; }
+  .form-section { height: auto; min-height: auto; }
+  .log-section { height: 64vh; min-height: 320px; }
 }
 @media (max-width: 560px) {
   header { align-items: flex-start; flex-direction: column; }
@@ -670,7 +684,7 @@ pre {
 <body>
 <div class="app">
   <header>
-    <h1>SuperStar 控制台</h1>
+    <h1>番星 StudyFlow 控制台</h1>
     <div class="status" id="status">就绪</div>
   </header>
   <main>
@@ -758,6 +772,7 @@ const aiEnabled = document.getElementById("aiEnabled");
 const aiPanel = document.getElementById("aiPanel");
 const modelsBtn = document.getElementById("modelsBtn");
 const modelList = document.getElementById("modelList");
+const MAX_LOG_CHARS = 120000;
 let logIndex = 0;
 
 function setMessage(text, isError = false) {
@@ -802,6 +817,23 @@ function canFetchModels() {
   return aiEnabled.checked && form.elements.endpoint.value.trim() && form.elements.key.value.trim();
 }
 
+function trimLogText() {
+  if (logEl.textContent.length <= MAX_LOG_CHARS) return;
+  const tail = logEl.textContent.slice(-MAX_LOG_CHARS);
+  const firstBreak = tail.indexOf("\n");
+  logEl.textContent = "[日志已自动清理，仅保留最近输出]\n" + (
+    firstBreak >= 0 ? tail.slice(firstBreak + 1) : tail
+  );
+}
+
+function appendLogs(logs) {
+  if (!logs.length) return;
+  const nearBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 48;
+  logEl.textContent += logs.join("");
+  trimLogText();
+  if (nearBottom) logEl.scrollTop = logEl.scrollHeight;
+}
+
 async function refreshModels() {
   if (!canFetchModels()) {
     setMessage("填写 Endpoint 和 API Key 后会获取模型列表");
@@ -839,8 +871,7 @@ async function poll() {
     startBtn.disabled = data.running;
     stopBtn.disabled = !data.running;
     if (data.logs.length) {
-      logEl.textContent += data.logs.join("");
-      logEl.scrollTop = logEl.scrollHeight;
+      appendLogs(data.logs);
       logIndex = data.next;
     }
   } catch (error) {
@@ -921,7 +952,7 @@ def build_server(host, port, runner):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SuperStar 本地网页控制台")
+    parser = argparse.ArgumentParser(description="番星 StudyFlow 本地网页控制台")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--no-open", action="store_true", help="不自动打开浏览器")
@@ -930,7 +961,7 @@ def main():
     runner = Runner()
     server, port = build_server(args.host, args.port, runner)
     url = f"http://{args.host}:{port}/"
-    print(f"SuperStar 网页控制台已启动: {url}", flush=True)
+    print(f"番星 StudyFlow 网页控制台已启动: {url}", flush=True)
     print("按 Ctrl+C 停止服务", flush=True)
     if not args.no_open:
         webbrowser.open(url)
