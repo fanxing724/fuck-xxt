@@ -20,6 +20,8 @@ from api.answer import Tiku
 # 关闭SSL警告
 disable_warnings(exceptions.InsecureRequestWarning)
 
+DEFAULT_SPEED = 2.0
+
 
 def str_to_bool(value):
     """将配置文件里的布尔值转换为bool"""
@@ -46,7 +48,7 @@ def parse_args():
         help="要学习的课程ID，多个用逗号分隔，如：123456,789012"
     )
     parser.add_argument(
-        "-s", "--speed", type=float, default=2.0, 
+        "-s", "--speed", type=float, default=argparse.SUPPRESS,
         help="视频播放倍速（默认2倍速，最大2）"
     )
     parser.add_argument(
@@ -98,6 +100,13 @@ def load_config(config_path):
         notification_config = dict(config.items("notification"))
     
     return common_config, tiku_config, notification_config
+
+
+def parse_course_list(value):
+    """解析课程ID列表，支持逗号分隔和 *。"""
+    if value is None:
+        return None
+    return [item.strip() for item in str(value).split(",") if item.strip()]
 
 
 def get_user_input():
@@ -195,8 +204,13 @@ def process_job(chaoxing, course, job, job_info, speed):
         chaoxing.study_document(course, job)
         
     elif job["type"] == "workid":
-        logger.info(f"[测验] {course['title']} - 需要手动完成")
-        logger.info("  ⚠️  章节测验需手动完成，已跳过")
+        logger.info(f"[测验] {course['title']}")
+        if not chaoxing.tiku or chaoxing.tiku.DISABLE:
+            logger.info("  ⚠️  未启用 AI 答题，章节测验已跳过")
+            return
+        result = chaoxing.study_work(course, job, job_info)
+        if chaoxing.StudyResult.is_failure(result):
+            logger.warning(f"测验任务异常，已跳过: {job['jobid']}")
         
     elif job["type"] == "read":
         logger.info(f"[阅读] {course['title']} - {job.get('name', '未知阅读')}")
@@ -314,10 +328,23 @@ def main():
             course_list = common_config.get("course_list")
             if common_config.get("auto_select_all") and not course_list:
                 course_list = ["*"]
-            speed = common_config.get("speed", args.speed)
+            speed = common_config.get("speed", DEFAULT_SPEED)
         else:
-            username, password = get_user_input()
-            course_list = [item.strip() for item in args.list.split(",") if item.strip()] if args.list else None
+            if args.username and args.password:
+                username = args.username
+                password = args.password
+            else:
+                username, password = get_user_input()
+            course_list = None
+            speed = DEFAULT_SPEED
+
+        if args.username:
+            username = args.username
+        if args.password:
+            password = args.password
+        if args.list is not None:
+            course_list = parse_course_list(args.list)
+        if hasattr(args, "speed"):
             speed = args.speed
         
         # 规范化速度
@@ -358,7 +385,8 @@ def main():
     except Exception as e:
         logger.error(f"错误: {type(e).__name__}: {e}")
         logger.error(traceback.format_exc())
-        input("\n按回车键退出...")
+        if sys.stdin.isatty():
+            input("\n按回车键退出...")
         sys.exit(1)
 
 

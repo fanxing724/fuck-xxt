@@ -11,8 +11,10 @@ def _resolve_root() -> Path:
 
 def main():
     root = _resolve_root()
+    app_dir = root / "app"
     os.chdir(root)
     sys.path.insert(0, str(root))
+    sys.path.insert(0, str(app_dir))
 
     if "--cli" in sys.argv:
         sys.argv.remove("--cli")

@@ -450,7 +450,7 @@ def _extract_choices(element, font_decoder=None) -> str:
         return ""
         
     # 提取aria-label属性值作为选项，解决#474
-    choice = element.get('aria-label')
+    choice = element.get('aria-label') or element.get_text("", strip=True)
     
     cleaned_content = choice.replace("\r", "").replace("\t", "").replace("\n", "")
     

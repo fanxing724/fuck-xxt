@@ -436,6 +436,12 @@ class AI(Tiku):
         options_list = q_info['options'].split('\n')
         cleaned_options = [re.sub(r"^[A-Z]\s*", "", option) for option in options_list]
         options = "\n".join(cleaned_options)
+        if self.last_request_time:
+            interval_time = time.time() - self.last_request_time
+            if interval_time < self.min_interval_seconds:
+                sleep_time = self.min_interval_seconds - interval_time
+                logger.debug(f"API请求间隔过短, 等待 {sleep_time} 秒")
+                time.sleep(sleep_time)
         # 判断题目类型
         if q_info['type'] == "single":
             completion = client.chat.completions.create(
@@ -509,12 +515,6 @@ class AI(Tiku):
             )
 
         try:
-            if self.last_request_time:
-                interval_time = time.time() - self.last_request_time
-                if interval_time < self.min_interval_seconds:
-                    sleep_time = self.min_interval_seconds - interval_time
-                    logger.debug(f"API请求间隔过短, 等待 {sleep_time} 秒")
-                    time.sleep(sleep_time)
             self.last_request_time = time.time()
             response = json.loads(remove_md_json_wrapper(completion.choices[0].message.content))
             sep = "\n"

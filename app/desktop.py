@@ -108,7 +108,7 @@ class FanxingStudyFlowDesktop(tk.Tk):
         provider_combo = ttk.Combobox(
             tiku_frame,
             textvariable=self.tiku_provider_var,
-            values=["", "TikuYanxi", "AI", "SiliconFlow"],
+            values=["", "AI"],
             state="readonly",
             width=18,
         )
@@ -184,11 +184,6 @@ class FanxingStudyFlowDesktop(tk.Tk):
                 self.tiku_endpoint_var.set("https://api.openai.com/v1")
             if not model or model == "deepseek-ai/DeepSeek-V3":
                 self.tiku_model_var.set("gpt-4o-mini")
-        elif provider == "SiliconFlow":
-            if not endpoint or endpoint == "https://api.openai.com/v1":
-                self.tiku_endpoint_var.set("https://api.siliconflow.cn/v1/chat/completions")
-            if not model or model == "gpt-4o-mini":
-                self.tiku_model_var.set("deepseek-ai/DeepSeek-V3")
 
     def _load_default_config(self):
         if CONFIG_PATH.exists():
@@ -340,11 +335,8 @@ class FanxingStudyFlowDesktop(tk.Tk):
         provider = self.tiku_provider_var.get().strip()
         if not provider:
             return True
-        if provider == "TikuYanxi" and not self.tiku_tokens_var.get().strip():
-            messagebox.showerror("题库配置缺失", "TikuYanxi 需要填写 Tokens")
-            return False
-        if provider in {"AI", "SiliconFlow"} and not self.tiku_key_var.get().strip():
-            messagebox.showerror("题库配置缺失", f"{provider} 需要填写 API Key")
+        if provider == "AI" and not self.tiku_key_var.get().strip():
+            messagebox.showerror("题库配置缺失", "AI 需要填写 API Key")
             return False
         return True
 
