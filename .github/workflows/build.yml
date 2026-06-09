@@ -44,16 +44,16 @@ jobs:
         run: |
           case "$TARGET" in
             linux)
-              matrix='{"include":[{"os":"ubuntu-20.04","target":"linux","artifact_name":"FanxingStudyFlow-linux-x64","build_cmd":"bash scripts/build_linux_app.sh","artifact_path":"release/FanxingStudyFlow-linux-x64.tar.gz"}]}'
+              matrix='{"include":[{"os":"ubuntu-22.04","target":"linux","artifact_name":"FanxingStudyFlow-linux-x64","build_cmd":"bash scripts/build_linux_app.sh","artifact_path":"release/FanxingStudyFlow-linux-x64.tar.gz"}]}'
               ;;
             windows)
-              matrix='{"include":[{"os":"windows-2019","target":"windows","artifact_name":"FanxingStudyFlow-windows7-win11-x64","build_cmd":"pwsh scripts/build_windows_app.ps1","artifact_path":"release/FanxingStudyFlow-windows7-win11-x64.zip"}]}'
+              matrix='{"include":[{"os":"windows-2022","target":"windows","artifact_name":"FanxingStudyFlow-windows7-win11-x64","build_cmd":"pwsh scripts/build_windows_app.ps1","artifact_path":"release/FanxingStudyFlow-windows7-win11-x64.zip"}]}'
               ;;
             macos)
-              matrix='{"include":[{"os":"macos-13","target":"macos","artifact_name":"FanxingStudyFlow-macos10.13-x64","build_cmd":"bash scripts/build_macos_app.sh","artifact_path":"release/FanxingStudyFlow-macos10.13-x64.tar.gz"}]}'
+              matrix='{"include":[{"os":"macos-15-intel","target":"macos","artifact_name":"FanxingStudyFlow-macos10.13-x64","build_cmd":"bash scripts/build_macos_app.sh","artifact_path":"release/FanxingStudyFlow-macos10.13-x64.tar.gz"}]}'
               ;;
             all)
-              matrix='{"include":[{"os":"ubuntu-20.04","target":"linux","artifact_name":"FanxingStudyFlow-linux-x64","build_cmd":"bash scripts/build_linux_app.sh","artifact_path":"release/FanxingStudyFlow-linux-x64.tar.gz"},{"os":"windows-2019","target":"windows","artifact_name":"FanxingStudyFlow-windows7-win11-x64","build_cmd":"pwsh scripts/build_windows_app.ps1","artifact_path":"release/FanxingStudyFlow-windows7-win11-x64.zip"},{"os":"macos-13","target":"macos","artifact_name":"FanxingStudyFlow-macos10.13-x64","build_cmd":"bash scripts/build_macos_app.sh","artifact_path":"release/FanxingStudyFlow-macos10.13-x64.tar.gz"}]}'
+              matrix='{"include":[{"os":"ubuntu-22.04","target":"linux","artifact_name":"FanxingStudyFlow-linux-x64","build_cmd":"bash scripts/build_linux_app.sh","artifact_path":"release/FanxingStudyFlow-linux-x64.tar.gz"},{"os":"windows-2022","target":"windows","artifact_name":"FanxingStudyFlow-windows7-win11-x64","build_cmd":"pwsh scripts/build_windows_app.ps1","artifact_path":"release/FanxingStudyFlow-windows7-win11-x64.zip"},{"os":"macos-15-intel","target":"macos","artifact_name":"FanxingStudyFlow-macos10.13-x64","build_cmd":"bash scripts/build_macos_app.sh","artifact_path":"release/FanxingStudyFlow-macos10.13-x64.tar.gz"}]}'
               ;;
             *)
               echo "Unsupported target: $TARGET" >&2
